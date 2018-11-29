@@ -1,0 +1,23 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: maxmcd/wasm-servers:circleci
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: build go
+          command: |
+            docker-compose build go
+      - run:
+          name: build go-print
+          command: |
+            docker-compose build go-print
+            docker-compose run go-print
+      - run:
+          name: build rust-basic
+          command: |
+            docker-compose build rust-basic
+            docker-compose run rust-basic
