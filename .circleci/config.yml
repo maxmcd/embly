@@ -12,6 +12,10 @@ jobs:
           command: |
             docker-compose build go
       - run:
+          name: build runtime
+          command: |
+            docker-compose build runtime
+      - run:
           name: build go-print
           command: |
             docker-compose build go-print

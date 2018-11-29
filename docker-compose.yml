@@ -12,6 +12,11 @@ services:
     volumes: 
       - ./cmd/node-server/:/opt/
     command: node --max_old_space_size=80 lib.js
+  runtime:
+    build:
+      context: ./cmd/runtime
+      dockerfile: ./Dockerfile
+    image: maxmcd/wasm-servers:runtime
   circleci:
     build:
       context: ./cmd/circleci-runner
@@ -29,6 +34,6 @@ services:
     image: maxmcd/wasm-servers:go-print
   rust-basic:
     build:
-      context: ./cmd
-      dockerfile: ./rust-basic/Dockerfile
+      context: ./cmd/rust-basic
+      dockerfile: ./Dockerfile
     image: maxmcd/wasm-servers:rust-basic
