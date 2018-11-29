@@ -1,4 +1,4 @@
-FROM maxmcd/wasm-servers:go-wasm
+FROM maxmcd/wasm-servers:go
 
 RUN mkdir -p /go/src/github.com/perlin-network/life/ \
     && cd /go/src/github.com/perlin-network/life \
