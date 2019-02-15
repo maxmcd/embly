@@ -31,9 +31,6 @@ func (e *eventState) error() bool {
 }
 
 func (e *eventState) dead() bool {
-	print("dddd")
-	print(1000 + e.state)
-	println("dddd")
 	return e.error() || e.hup()
 }
 
@@ -62,12 +59,10 @@ func (e *eventState) readwait() error {
 		if e.dead() {
 			return errors.New("wasabi: Connection closed")
 		}
-		println("not dead")
 		if e.readable() {
 			e.state = e.state ^ (1 << 0)
 			break
 		}
-		println("not readable, waiting")
 		e.cond.Wait()
 	}
 	e.cond.L.Unlock()
@@ -86,7 +81,6 @@ var connections map[int32]*eventState
 func init() {
 	connections = make(map[int32]*eventState)
 	callback := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		println("called callback")
 		for i, _ := range args {
 			if i%2 != 0 {
 				continue
@@ -117,8 +111,6 @@ type Listener struct {
 func acceptTcp(id int32) (int32, bool)
 
 func (l *Listener) Accept() (c Conn, err error) {
-	println("l.Accept")
-
 	for {
 		token, ok := acceptTcp(l.token)
 		if ok {
@@ -145,6 +137,7 @@ type Conn struct {
 func readConn(id int32, b []byte) (int32, bool)
 
 func (c *Conn) Read(b []byte) (ln int, err error) {
+	// TODO EOF error?
 	for {
 		length, ok := readConn(c.token, b)
 		if ok {
@@ -224,7 +217,6 @@ func ListenTcp(addr string) (Listener, error) {
 	err := errors.New(string(bytes))
 	// TODO: don't just pass a negative number
 	return Listener{token: -1}, err
-
 }
 
 // func DialContext(ctx context.Context, network, addr string) (net.Conn, error) {
@@ -241,7 +233,6 @@ func Dial(network, addr string) (c net.Conn, err error) {
 	}
 	ref, ok := dialTcp(addr)
 	if ok {
-		println("ok")
 		connections[ref] = newEventState()
 		if err := connections[ref].writewait(); err != nil {
 			return c, err
