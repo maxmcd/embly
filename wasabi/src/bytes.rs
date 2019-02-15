@@ -1,19 +1,19 @@
 pub fn as_i32_le(array: &[u8]) -> i32 {
-    ((array[0] as i32) << 0)
-        | ((array[1] as i32) << 8)
-        | ((array[2] as i32) << 16)
-        | ((array[3] as i32) << 24)
+    i32::from(array[0])
+        | (i32::from(array[1]) << 8)
+        | (i32::from(array[2]) << 16)
+        | (i32::from(array[3]) << 24)
 }
 
 pub fn as_i64_le(array: &[u8]) -> i64 {
-    ((array[0] as i64) << 0)
-        | ((array[1] as i64) << 8)
-        | ((array[2] as i64) << 16)
-        | ((array[3] as i64) << 24)
-        | ((array[4] as i64) << 32)
-        | ((array[5] as i64) << 40)
-        | ((array[6] as i64) << 48)
-        | ((array[7] as i64) << 56)
+    i64::from(array[0])
+        | (i64::from(array[1]) << 8)
+        | (i64::from(array[2]) << 16)
+        | (i64::from(array[3]) << 24)
+        | (i64::from(array[4]) << 32)
+        | (i64::from(array[5]) << 40)
+        | (i64::from(array[6]) << 48)
+        | (i64::from(array[7]) << 56)
 }
 
 pub fn i64_as_u8_le(x: i64) -> [u8; 8] {
