@@ -26,8 +26,19 @@ $(OBJDIR)/generate_comms_proto: pkg/core/proto/comms.proto
 	cd embly-wrapper-rs && cargo build
 	touch build/generate_comms_proto
 
+build_build_server: $(OBJDIR)/build_build_server
+$(OBJDIR)/build_build_server: pkg/nixbuild/* pkg/nixbuild/**/* cmd/build-server/*
+	cd cmd/build-server \
+	&& docker -l=info build -f ./Dockerfile -t embly/build-server ../.. \
+	&& docker kill embly-build || true \
+	&& docker rm embly-build || true
+	touch build/build_build_server
+
 all:
 	make -j install_embly install_embly_wrapper generate_http_proto generate_comms_proto
+
+generate: generate_comms_proto generate_http_proto
+	cd pkg/nixbuild && go generate
 
 build_embly:
 	make -j install_embly install_embly_wrapper
@@ -41,12 +52,18 @@ push_embly_image:
 test:
 	make -j wrapper_test cargo_test go_test
 
+build_server_shell:
+	docker run -it embly/build-server sh
+
+push_build_server: build_build_server
+	docker --config=~/.docker-embly  push embly/build-server
+
 build_examples: build_embly
 	cd examples/mjpeg && embly build
 	cd examples/kv && embly build
 	cd examples/project && embly build
 
-build_hello_world:
+build_hello_world: install_embly build_build_server
 	cd examples/hello-world && embly build
 
 go_test:
@@ -76,6 +93,9 @@ bundle_kv_example: build_embly
 
 bundle_project_example: build_embly
 	cd examples/project && embly bundle
+
+new_build: install_embly
+	cd examples/hello-world && embly build
 
 run_project_example: build_embly
 	cd examples/project && embly dev

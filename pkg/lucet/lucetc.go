@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 )
 
@@ -113,12 +113,12 @@ func hashFile(file string) (out string, err error) {
 }
 
 func cacheDir() (dir string, err error) {
-	usr, err := user.Current()
+	homedir, err := homedir.Dir()
 	if err != nil {
 		err = errors.WithStack(err)
 		return
 	}
-	dir = filepath.Join(usr.HomeDir, "./.embly/lucet_cache")
+	dir = filepath.Join(homedir, "./.embly/lucet_cache")
 	return
 }
 
@@ -138,7 +138,9 @@ func createHomeDir() (err error) {
 
 // CompileWasmToObject runs lucetc with our bindings to create a local object file
 func CompileWasmToObject(file, out string) (err error) {
-	createHomeDir()
+	if err = createHomeDir(); err != nil {
+		return
+	}
 
 	hash, err := hashFile(file)
 	if err != nil {
